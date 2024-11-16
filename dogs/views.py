@@ -40,7 +40,7 @@ breed_param = openapi.Parameter(
         required=['breed']
     ),
     responses={
-        200: "Success - Returns details of the dog breed",
+        200: "Success - Returns details and gif of the dog breed",
         400: "Bad Request - Breed not specified",
         404: "Not Found - Breed not found in external API"
     }
@@ -73,7 +73,7 @@ def fetch_breed_details(request):
                 image_url=dog_image_url,
             )
 
-            # Serialize the response
+            # Serialize the successful response
             serializer = DogBreedSerializer(dog_breed)
             return Response({
                 "status": "success",
@@ -177,3 +177,32 @@ def user_search_history(request):
         "status": "success",
         "data": serializer.data
         }, status=status.HTTP_200_OK)
+
+
+
+
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Deletes all the search history of dog breeds. Only accessible for admin. Provide your JWT token prefixed with 'Bearer'",
+    responses={
+        200: "Success - Deleted search history",
+        401: "Unauthorized - Invalid or missing token",
+        403: "Forbidden - Admin access only"
+    },
+    security=[{'Bearer': []}] 
+)
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_all_searches(request):
+    try:
+        DogBreed.objects.all().delete()
+        return Response({
+            "status": "success",
+            "message": "All search history has been deleted."
+        }, status=status.HTTP_204_NO_CONTENT)
+    
+    except Exception as e:
+        return Response({
+            "status": "error",
+            "message": f"An error occurred while deleting records: {str(e)}"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
