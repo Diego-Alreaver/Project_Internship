@@ -15,6 +15,9 @@ from drf_yasg import openapi
 from .models import DogBreed
 from .serializers import DogBreedSerializer, DogBreedHistorySerializer
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 load_dotenv() # get sensible data from .env
 GIPHY_API_KEY = os.getenv('GIPHY_API_KEY')
 DOGS_API_URL = "https://api.thedogapi.com/v1/breeds"

@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+from decouple import config
 
 load_dotenv() 
 
@@ -149,10 +150,23 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True 
+IS_DEVELOPMENT = os.getenv('DJANGO_DEVELOPMENT', 'False') == 'True'
 
-SWAGGER_SETTINGS = {
+if IS_DEVELOPMENT:  # local configuration
+    SWAGGER_SETTINGS = {
+        'USE_SESSION_AUTH': False,
+        'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
+    SECURE_PROXY_SSL_HEADER = None
+    SECURE_SSL_REDIRECT = False
+else:  # production conf
+    SWAGGER_SETTINGS = {
     'USE_HTTPS': True,
     'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
@@ -161,5 +175,9 @@ SWAGGER_SETTINGS = {
             'name': 'Authorization',
             'in': 'header',
         }
-    },
+    },  
 }
+    print(f"IS_DEVELOPMENT: {IS_DEVELOPMENT}")
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+

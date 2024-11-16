@@ -13,6 +13,7 @@ drf-yasg = "*"
 gunicorn = "*"
 whitenoise = "*"
 django-cors-headers = "*"
+python-decouple = "*"
 
 [dev-packages]
 

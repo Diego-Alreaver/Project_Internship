@@ -11,4 +11,3 @@ class DogBreedHistorySerializer(DogBreedSerializer):
     time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta(DogBreedSerializer.Meta):
         fields = DogBreedSerializer.Meta.fields + ['time']
-
