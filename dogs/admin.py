@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import DogBreed
 
-# Register your models here.
+# Registrar el modelo DogBreed
+admin.site.register(DogBreed)
