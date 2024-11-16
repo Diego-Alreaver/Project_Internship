@@ -18,6 +18,7 @@ def get_dog_info(request):
     breed_name = request.data.get('breed', '')
 
     if breed_name:
+        # Obtener información de la raza de perro desde la API externa
         dog_api_url = f"https://api.thedogapi.com/v1/breeds/search?q={breed_name}"
         response = requests.get(dog_api_url)
 
@@ -26,14 +27,13 @@ def get_dog_info(request):
             dog_breed_name = dog_data.get('name', 'No name available')
             dog_temperament = dog_data.get('temperament', 'No temperament information available')
 
-            # Obtener imagen de Giphy
+            # Obtener imagen desde Giphy
             giphy_url = f"https://api.giphy.com/v1/gifs/search?api_key={GIPHY_API_KEY}&q={breed_name}&limit=1"
             giphy_response = requests.get(giphy_url)
 
+            dog_image_url = "No image available"
             if giphy_response.status_code == 200 and giphy_response.json()['data']:
                 dog_image_url = giphy_response.json()['data'][0]['images']['original']['url']
-            else:
-                dog_image_url = "No image available"
 
             # Guardar búsqueda en la base de datos
             dog_breed = DogBreed.objects.create(
@@ -44,16 +44,25 @@ def get_dog_info(request):
 
             # Usar el serializer para devolver la respuesta
             serializer = DogBreedSerializer(dog_breed)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Breed not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                "status": "success",
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
 
-    return Response({"error": "No breed specified"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "error": "Breed not found",
+            "details": f"Could not find breed '{breed_name}' in external API"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        "error": "No breed specified",
+        "details": "Please provide a breed name in the request body."
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_dog_breeds(request):
     # Obtener los filtros opcionales desde la query string, si existen
-    filter_terms = request.GET.getlist('filter')  # .getlist() nos da una lista de filtros
+    filter_terms = request.GET.getlist('filter')
 
     # Revisamos si ya existe un cache para las razas
     cached_breeds = cache.get('dog_breeds')
@@ -67,7 +76,6 @@ def get_dog_breeds(request):
                 {'name': breed.get('name', 'Unknown breed'), 'description': breed.get('temperament', '')}
                 for breed in breeds
             ]
-            
             # Cacheamos todas las razas para futuras peticiones
             cache.set('dog_breeds', breed_names, timeout=86400)  # Cache por 24 horas
         else:
@@ -89,7 +97,10 @@ def get_dog_breeds(request):
     # Extraemos solo los nombres de las razas, sin necesidad de otros atributos
     breed_names = [breed['name'] for breed in breed_names]
     
-    return Response(breed_names, status=status.HTTP_200_OK)
+    return Response({
+        "status": "success",
+        "data": breed_names
+    }, status=status.HTTP_200_OK)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])  # Solo el admin puede acceder a este endpoint
@@ -108,4 +119,7 @@ def user_search_history(request):
 
     serializer = DogBreedHistorySerializer(searches, many=True)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({
+        "status": "success",
+        "data": serializer.data
+        }, status=status.HTTP_200_OK)
