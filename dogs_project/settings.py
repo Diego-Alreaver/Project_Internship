@@ -13,8 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('Django_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+IS_DEVELOPMENT = os.getenv('DJANGO_DEVELOPMENT', 'False') == 'True'
+
+DEBUG = IS_DEVELOPMENT
 
 ALLOWED_HOSTS = [
     'projectinternship-production.up.railway.app',
@@ -150,7 +151,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-IS_DEVELOPMENT = os.getenv('DJANGO_DEVELOPMENT', 'False') == 'True'
+
 
 if IS_DEVELOPMENT:  # local configuration
     SWAGGER_SETTINGS = {

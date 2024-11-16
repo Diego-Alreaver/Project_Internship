@@ -15,8 +15,6 @@ from drf_yasg import openapi
 from .models import DogBreed
 from .serializers import DogBreedSerializer, DogBreedHistorySerializer
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 load_dotenv() # get sensible data from .env
 GIPHY_API_KEY = os.getenv('GIPHY_API_KEY')
@@ -99,7 +97,7 @@ def fetch_breed_details(request):
 filters_param = openapi.Parameter( # adds the option on swagger to include a filter or filters
     'filter',
     openapi.IN_QUERY,
-    description="Optional filter terms to search in breed names or descriptions (comma-separated)",
+    description="Optional filter terms to search breeds by traits like friendly, loyal, fierce",
     type=openapi.TYPE_ARRAY,
     items=openapi.Items(type=openapi.TYPE_STRING),
     collection_format="multi"
