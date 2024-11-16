@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import DogBreed
-from rest_framework.fields import DateTimeField
+from rest_framework import serializers
+
 
 class DogBreedSerializer(serializers.ModelSerializer):
     class Meta:

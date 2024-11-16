@@ -5,16 +5,46 @@ from rest_framework.response import Response
 from rest_framework import status
 from dotenv import load_dotenv
 from .models import DogBreed
-from rest_framework.permissions import IsAuthenticated,  IsAdminUser
+from rest_framework.permissions import IsAdminUser
 from .serializers import DogBreedSerializer, DogBreedHistorySerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
 
 load_dotenv() 
 GIPHY_API_KEY = os.getenv('GIPHY_API_KEY')
 DOGS_API_URL = "https://api.thedogapi.com/v1/breeds"
 
+# Define el esquema del parámetro esperado
+breed_param = openapi.Parameter(
+    'breed',
+    openapi.IN_BODY,
+    description="Breed name to fetch details and image",
+    type=openapi.TYPE_STRING
+)
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Fetch dog breed details and a gif from Giphy.",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'breed': openapi.Schema(type=openapi.TYPE_STRING, description='Dog breed name')
+        },
+        required=['breed']
+    ),
+    responses={
+        200: "Success - Returns details of the dog breed",
+        400: "Bad Request - Breed not specified",
+        404: "Not Found - Breed not found in external API"
+    }
+)
+
 # I chose @api_view instead of APIVIEW (class-based) to keep it simple
 @api_view(['POST'])
-def get_dog_info(request):
+def fetch_breed_details(request):
     breed_name = request.data.get('breed', '')
 
     if breed_name:
@@ -59,10 +89,26 @@ def get_dog_info(request):
         "details": "Please provide a breed name in the request body."
     }, status=status.HTTP_400_BAD_REQUEST)
 
+filters_param = openapi.Parameter(
+    'filter',
+    openapi.IN_QUERY,
+    description="Optional filter terms to search in breed names or descriptions (comma-separated)",
+    type=openapi.TYPE_ARRAY,
+    items=openapi.Items(type=openapi.TYPE_STRING),
+    collection_format="multi"
+)
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get a list of dog breeds. Optionally filter by terms.",
+    manual_parameters=[filters_param],
+    responses={200: "Success - List of breeds", 500: "Internal Server Error"}
+)
 @api_view(['GET'])
+
 def get_dog_breeds(request):
     # Obtener los filtros opcionales desde la query string, si existen
-    filter_terms = request.GET.getlist('filter')
+    search_terms = request.GET.getlist('filter')
 
     # Revisamos si ya existe un cache para las razas
     cached_breeds = cache.get('dog_breeds')
@@ -85,13 +131,13 @@ def get_dog_breeds(request):
         breed_names = cached_breeds
 
     # Si hay filtros, aplicamos los filtros
-    if filter_terms:
-        filter_terms = [term.lower() for term in filter_terms]  # Convertimos los términos a minúsculas
+    if search_terms:
+        search_terms = [term.lower() for term in search_terms]  # Convertimos los términos a minúsculas
         
         # Filtramos las razas que contengan **todos** los términos de búsqueda en el nombre o la descripción
         breed_names = [
             breed for breed in breed_names
-            if all(term in breed['name'].lower() or term in breed['description'].lower() for term in filter_terms)
+            if all(term in breed['name'].lower() or term in breed['description'].lower() for term in search_terms)
         ]
     
     # Extraemos solo los nombres de las razas, sin necesidad de otros atributos
@@ -102,8 +148,18 @@ def get_dog_breeds(request):
         "data": breed_names
     }, status=status.HTTP_200_OK)
     
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get the search history of dog breeds. Provide your JWT token prefixed with 'Bearer'",
+    responses={
+        200: "Success - List of search history",
+        401: "Unauthorized - Invalid or missing token",
+        403: "Forbidden - Admin access only"
+    },
+    security=[{'Bearer': []}] 
+)
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, IsAdminUser])  # Solo el admin puede acceder a este endpoint
+@permission_classes([IsAdminUser])
 def user_search_history(request):
 
     searches = DogBreed.objects.all()
