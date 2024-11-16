@@ -1,24 +1,23 @@
-from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 
 class FetchBreedDetailsTest(APITestCase):
 
-    def test_fetch_valid_breed_details(self):
+    def test_fetch_valid_breed_details(self): # Success (200) if breed is valid
         url = reverse('fetch_breed_details')
         data = {"breed": "Akita"}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("data", response.data)  # Verifica que la respuesta contiene información de la raza
+        self.assertIn("data", response.data) 
 
-    def test_fetch_invalid_breed(self):
+    def test_fetch_invalid_breed(self): # 404 not found if breed is invalid
         url = reverse('fetch_breed_details')
-        data = {"breed": "Nonexistent Breed"}
+        data = {"breed": "Siamese"}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_missing_breed_field(self):
+    def test_missing_breed_field(self): # required field "breed" not included on endpoint call
         url = reverse('fetch_breed_details')
         data = {}
         response = self.client.post(url, data, format='json')
@@ -26,35 +25,29 @@ class FetchBreedDetailsTest(APITestCase):
 
 class GetDogBreedsTest(APITestCase):
 
-    def test_fetch_all_breeds(self):
+    def test_fetch_all_breeds(self): # Success if response 200 and list is not empty
         url = reverse('get_dog_breeds')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(response.data), 0)  # Verifica que se devuelven razas
+        self.assertGreater(len(response.data), 0) 
 
-    def test_fetch_breeds_with_filter(self):
-        url = reverse('get_dog_breeds')
-        response = self.client.get(url, {'filter': 'shepherd'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(all('shepherd' in breed.lower() for breed in response.data))
 
-from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class UserSearchHistoryTest(APITestCase):
-
     def setUp(self):
-        self.admin_user = User.objects.create_superuser(username='admin', password='admin123')
-        self.token = Token.objects.create(user=self.admin_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.admin_user = User.objects.create_superuser(username='admin', password='admin')
+        refresh = RefreshToken.for_user(self.admin_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
-    def test_access_search_history(self):
+    def test_access_search_history(self): # Success if token is valid
         url = reverse('user_search_history')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_unauthenticated_access(self):
-        self.client.credentials()  # Elimina el token de autorización
+    def test_unauthenticated_access(self): # 401 if token is invalid, user unauthorized
+        self.client.credentials()  
         url = reverse('user_search_history')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

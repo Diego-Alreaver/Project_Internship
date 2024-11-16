@@ -2,11 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Endpoint para obtener las razas de perros
-    path('breeds/', views.get_dog_breeds, name='get_dog_breeds'),  # GET para obtener razas
+    # Endpoint to get dogs breeds 
+    path('breeds/', views.get_dog_breeds, name='get_dog_breeds'),
 
-    path('breeds/details/', views.fetch_breed_details, name='fetch_breed_details'), # POST para obtener detalles y la imagen
+    # Endpoint to get details and gif on a specific dog 
+    path('breeds/details/', views.fetch_breed_details, name='fetch_breed_details'), 
 
-    # Endpoint para ver el historial de búsquedas, solo admin puede acceder
-    path('search-history/', views.user_search_history, name='user_search_history'),  # Historial de búsquedas
+    # Endpoint to see search history, only accessible to admin 
+    path('search-history/', views.user_search_history, name='user_search_history'),  
 ]

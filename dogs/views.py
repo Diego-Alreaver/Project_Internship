@@ -1,33 +1,37 @@
-import requests, os
+import os
+from dotenv import load_dotenv
+import requests
+
 from django.core.cache import cache
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from dotenv import load_dotenv
-from .models import DogBreed
 from rest_framework.permissions import IsAdminUser
-from .serializers import DogBreedSerializer, DogBreedHistorySerializer
+
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status
 
-load_dotenv() 
+from .models import DogBreed
+from .serializers import DogBreedSerializer, DogBreedHistorySerializer
+
+load_dotenv() # get sensible data from .env
 GIPHY_API_KEY = os.getenv('GIPHY_API_KEY')
 DOGS_API_URL = "https://api.thedogapi.com/v1/breeds"
 
-# Define el esquema del parámetro esperado
+
+
+
+# Define expected parameter on POST
 breed_param = openapi.Parameter(
     'breed',
     openapi.IN_BODY,
     description="Breed name to fetch details and image",
     type=openapi.TYPE_STRING
 )
-
 @swagger_auto_schema(
     method='post',
-    operation_description="Fetch dog breed details and a gif from Giphy.",
+    operation_description="Fetch dog breed details from thedogapi and a gif of that breed from Giphy.",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
@@ -41,15 +45,13 @@ breed_param = openapi.Parameter(
         404: "Not Found - Breed not found in external API"
     }
 )
-
-# I chose @api_view instead of APIVIEW (class-based) to keep it simple
+# I chose @api_view (function-based) instead of APIVIEW (class-based) to keep it simple as this is a small project
 @api_view(['POST'])
 def fetch_breed_details(request):
     breed_name = request.data.get('breed', '')
 
     if breed_name:
-        # Obtener información de la raza de perro desde la API externa
-        dog_api_url = f"https://api.thedogapi.com/v1/breeds/search?q={breed_name}"
+        dog_api_url = f"https://api.thedogapi.com/v1/breeds/search?q={breed_name}" # get breed info from thedogapi API
         response = requests.get(dog_api_url)
 
         if response.status_code == 200 and response.json():
@@ -57,22 +59,21 @@ def fetch_breed_details(request):
             dog_breed_name = dog_data.get('name', 'No name available')
             dog_temperament = dog_data.get('temperament', 'No temperament information available')
 
-            # Obtener imagen desde Giphy
-            giphy_url = f"https://api.giphy.com/v1/gifs/search?api_key={GIPHY_API_KEY}&q={breed_name}&limit=1"
+            giphy_url = f"https://api.giphy.com/v1/gifs/search?api_key={GIPHY_API_KEY}&q={breed_name}&limit=1" # get gif from giphy API
             giphy_response = requests.get(giphy_url)
 
             dog_image_url = "No image available"
             if giphy_response.status_code == 200 and giphy_response.json()['data']:
                 dog_image_url = giphy_response.json()['data'][0]['images']['original']['url']
 
-            # Guardar búsqueda en la base de datos
+            # Save user search to database in case admin wants that info
             dog_breed = DogBreed.objects.create(
                 name=dog_breed_name,
                 description=dog_temperament,
                 image_url=dog_image_url,
             )
 
-            # Usar el serializer para devolver la respuesta
+            # Serialize the response
             serializer = DogBreedSerializer(dog_breed)
             return Response({
                 "status": "success",
@@ -89,7 +90,10 @@ def fetch_breed_details(request):
         "details": "Please provide a breed name in the request body."
     }, status=status.HTTP_400_BAD_REQUEST)
 
-filters_param = openapi.Parameter(
+
+
+
+filters_param = openapi.Parameter( # adds the option on swagger to include a filter or filters
     'filter',
     openapi.IN_QUERY,
     description="Optional filter terms to search in breed names or descriptions (comma-separated)",
@@ -97,24 +101,20 @@ filters_param = openapi.Parameter(
     items=openapi.Items(type=openapi.TYPE_STRING),
     collection_format="multi"
 )
-
 @swagger_auto_schema(
     method='get',
-    operation_description="Get a list of dog breeds. Optionally filter by terms.",
+    operation_description="Get a list of dog breeds from thedogapi. Optionally filter by terms.",
     manual_parameters=[filters_param],
     responses={200: "Success - List of breeds", 500: "Internal Server Error"}
 )
 @api_view(['GET'])
-
 def get_dog_breeds(request):
-    # Obtener los filtros opcionales desde la query string, si existen
     search_terms = request.GET.getlist('filter')
 
-    # Revisamos si ya existe un cache para las razas
+    # Check if there is already a cache for breeds to optimize API calls
     cached_breeds = cache.get('dog_breeds')
     
-    if cached_breeds is None:
-        # Si no hay cache, obtenemos todas las razas de la API y las cacheamos
+    if cached_breeds is None: # Do the API call if there is no cache
         response = requests.get(DOGS_API_URL)
         if response.status_code == 200:
             breeds = response.json()
@@ -122,35 +122,35 @@ def get_dog_breeds(request):
                 {'name': breed.get('name', 'Unknown breed'), 'description': breed.get('temperament', '')}
                 for breed in breeds
             ]
-            # Cacheamos todas las razas para futuras peticiones
-            cache.set('dog_breeds', breed_names, timeout=86400)  # Cache por 24 horas
+            # Cache all the breeds for future request
+            cache.set('dog_breeds', breed_names, timeout=86400)  # Cache for 24 hours, since I assume we don't get new dog breeds every hour
         else:
             return Response({"error": "Failed to fetch breeds from DogsAPI"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
-        # Si ya hay cache, usamos los datos cacheados
-        breed_names = cached_breeds
+        breed_names = cached_breeds # If there is already a cache we use that data instead
 
-    # Si hay filtros, aplicamos los filtros
+    # Apply filters if there is any
     if search_terms:
-        search_terms = [term.lower() for term in search_terms]  # Convertimos los términos a minúsculas
-        
-        # Filtramos las razas que contengan **todos** los términos de búsqueda en el nombre o la descripción
+        search_terms = [term.lower() for term in search_terms] 
         breed_names = [
             breed for breed in breed_names
             if all(term in breed['name'].lower() or term in breed['description'].lower() for term in search_terms)
         ]
     
-    # Extraemos solo los nombres de las razas, sin necesidad de otros atributos
+    # We only want the name of the breeds that have these specific traits
     breed_names = [breed['name'] for breed in breed_names]
     
     return Response({
         "status": "success",
-        "data": breed_names
+        "data": breed_names,
     }, status=status.HTTP_200_OK)
-    
+
+
+
+
 @swagger_auto_schema(
     method='get',
-    operation_description="Get the search history of dog breeds. Provide your JWT token prefixed with 'Bearer'",
+    operation_description="Get the search history of dog breeds. Only accessible for admin. Provide your JWT token prefixed with 'Bearer'",
     responses={
         200: "Success - List of search history",
         401: "Unauthorized - Invalid or missing token",
@@ -161,16 +161,14 @@ def get_dog_breeds(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def user_search_history(request):
-
     searches = DogBreed.objects.all()
     
-
-    # Filtrar por palabra clave en la descripción, si 'keyword' está presente en los parámetros de la query
+    # Filter by keyword in the description, if 'keyword' is present in the query parameters
     keyword = request.query_params.get('keyword', None)
     if keyword:
-        searches = searches.filter(description__icontains=keyword)  # Filtrado no sensible a mayúsculas
+        searches = searches.filter(description__icontains=keyword) 
 
-    # Ordena por tiempo, más reciente primero
+    # Sort by time, newest first
     searches = searches.order_by('-time')
 
     serializer = DogBreedHistorySerializer(searches, many=True)
