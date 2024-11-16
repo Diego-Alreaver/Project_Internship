@@ -12,6 +12,7 @@ djangorestframework-simplejwt = "*"
 drf-yasg = "*"
 gunicorn = "*"
 whitenoise = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

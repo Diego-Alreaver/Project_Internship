@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'rest_framework',  
     'dogs',
     'rest_framework_simplejwt',
-    'drf_yasg', 
+    'drf_yasg',
+    'corsheaders', #to allow swagger to work on railway
 ]
 
 MIDDLEWARE = [
@@ -44,8 +45,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'dogs_project.urls'
 
@@ -66,7 +69,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dogs_project.wsgi.application'
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
