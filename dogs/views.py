@@ -185,7 +185,7 @@ def user_search_history(request):
     method='delete',
     operation_description="Deletes all the search history of dog breeds. Only accessible for admin. Provide your JWT token prefixed with 'Bearer'",
     responses={
-        200: "Success - Deleted search history",
+        204: "No content - Deleted search history",
         401: "Unauthorized - Invalid or missing token",
         403: "Forbidden - Admin access only"
     },
