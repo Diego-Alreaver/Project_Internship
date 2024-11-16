@@ -150,6 +150,7 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
+    'USE_HTTPS': True,
     'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
         'Bearer': {
