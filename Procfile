@@ -1,1 +1,1 @@
-web: gunicorn dogs_project.wsgi
+web: python manage.py collectstatic --noinput && gunicorn dogs_project.wsgi
