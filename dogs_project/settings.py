@@ -182,3 +182,18 @@ else:  # production conf
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
 
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],  # Asegúrate de que apunte a tu carpeta de plantillas
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",  # Necesario para la navegación en admin
+                "django.contrib.auth.context_processors.auth",  # Necesario para usar auth
+                "django.contrib.messages.context_processors.messages",  # Necesario para mensajes en admin
+            ],
+        },
+    },
+]

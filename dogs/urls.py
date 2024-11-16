@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     # Endpoint to get dogs breeds 
@@ -12,5 +13,7 @@ urlpatterns = [
     path('search-history/', views.user_search_history, name='user_search_history'), 
 
     # Endpoint to delete search history, only accessible to admin
-    path('search-history/delete/', views.delete_all_searches, name='delete_all_searches'), 
+    path('search-history/delete/', views.delete_all_searches, name='delete_all_searches'),
+
+    path("webpage", TemplateView.as_view(template_name="index.html"), name="home"), 
 ]

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog Breed Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    label, input {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    button {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .result img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dog Breed Finder</h1>
+    <form id="dogForm">
+      <label for="breed">Enter Dog Breed:</label>
+      <input type="text" id="breed" name="breed" required />
+      <button type="submit">Search</button>
+    </form>
+    <div class="result" id="result" style="display: none;">
+      <h2 id="dogName"></h2>
+      <p id="dogDescription"></p>
+      <img id="dogImage" alt="Dog Image" />
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('dogForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const breed = document.getElementById('breed').value.trim();
+      const resultDiv = document.getElementById('result');
+      const dogName = document.getElementById('dogName');
+      const dogDescription = document.getElementById('dogDescription');
+      const dogImage = document.getElementById('dogImage');
+
+      if (!breed) {
+        alert('Please enter a breed!');
+        return;
+      }
+
+      try {
+        // call to endpoint
+        const response = await fetch('http://127.0.0.1:8000/api/breeds/details/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ breed }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          alert(errorData.error || 'Failed to fetch breed details.');
+          return;
+        }
+
+        const data = await response.json();
+        const breedData = data.data;
+
+        dogName.textContent = breedData.name;
+        dogDescription.textContent = breedData.description;
+        dogImage.src = breedData.image_url;
+
+        resultDiv.style.display = 'block';
+      } catch (error) {
+        console.error('Error fetching dog breed details:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
