@@ -15,8 +15,10 @@ SECRET_KEY = os.getenv('Django_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'projectinternship-production.up.railway.app',
+    'localhost',  # Puedes agregar localhost si trabajas localmente también
+]
 
 # Application definition
 
