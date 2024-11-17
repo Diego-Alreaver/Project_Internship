@@ -65,11 +65,11 @@ The project is deployed on **Railway** and accessible at:
    - **Username**: `admin`
    - **Password**: `admin`
    
-   Using the these login credentials you can obtain the access token. The token can be found under the **access** field. 
-   - To use the token, click on **Authorize** in the Swagger UI and enter the token in the following format:  
+   Using the these login credentials you can obtain the access token.
+   - To use it, click on **Authorize** in the Swagger UI and enter the token in the following format:  
      `Bearer <your-token-here>` (Example: `Bearer LO68qqaW`).
 
-- The token is **necessary** to access the **search-history** endpoint as it is protected by JWT authentication.
+- This step is **necessary** to access the **search-history** endpoint as it is protected by JWT authentication.
   
 ### Optional Web Interface for POST Endpoint:
 - If you prefer testing the **POST** endpoint `breeds/details/` through a graphical interface, you can visit:  
@@ -88,21 +88,21 @@ The project is deployed on **Railway** and accessible at:
 1. Clone the repository:
    git clone https://github.com/Diego-Alreaver/](https://github.com/Diego-Alreaver/Project_Internship.git
    
-3. Set up a virtual environment with pipenv:
+2. Set up a virtual environment with pipenv:
    pipenv install
    pipenv shell
    
-4. Configure environment variables:
+3. Configure environment variables:
    In a .env inside the root of the project add this:
        GIPHY_API_KEY= yourgiphykey
        Django_KEY= "yourdjangokey"
        DJANGO_DEVELOPMENT=True
       
-5. Run migrations and start the server:
+4. Run migrations and start the server:
    python manage.py migrate
    python manage.py runserver
 
-6. Access Swagger documentation:
+5. Access Swagger documentation:
    Visit http://127.0.0.1:8000/swagger/
 
 Next steps are optional:
