@@ -106,12 +106,16 @@ The project is deployed on **Railway** and accessible at:
    Visit http://127.0.0.1:8000/swagger/
 
 Next steps are optional:
-Run unit tests: python manage.py test
-Access frontend webpage: http://127.0.0.1:8000/api/webpage/
+
+- Run unit tests:  
+  `python manage.py test`
+
+- Access frontend webpage:  
+  [http://127.0.0.1:8000/api/webpage/](http://127.0.0.1:8000/api/webpage/)
 
 ---
 
-### Images
+### 🖼️ Images
 
 **Swagger documentation**  
 ![Swagger documentation](https://github.com/user-attachments/assets/94a703d7-2d73-499c-a3f6-eb3585d80004)
