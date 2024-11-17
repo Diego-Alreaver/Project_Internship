@@ -65,7 +65,7 @@ The project is deployed on **Railway** and accessible at:
    - **Username**: `admin`
    - **Password**: `admin`
    
-   Using the these login credentials you can obtain the access token.
+   Using these login credentials you can obtain the access token.
    - To use it, click on **Authorize** in the Swagger UI and enter the token in the following format:  
      `Bearer <your-token-here>` (Example: `Bearer LO68qqaW`).
 
@@ -73,7 +73,8 @@ The project is deployed on **Railway** and accessible at:
   
 ### Optional Web Interface for POST Endpoint:
 - If you prefer testing the **POST** endpoint `breeds/details/` through a graphical interface, you can visit:  
-  [https://projectinternship-production.up.railway.app/api/webpage](https://projectinternship-production.up.railway.app/api/webpage)
+  [https://projectinternship-production.up.railway.app/api/webpage](https://projectinternship-production.up.railway.app/api/webpage)  
+
 **Note**: Please be aware that the interface is quite simple, as frontend is not my strong suit.
 
 ---
