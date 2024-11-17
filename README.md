@@ -112,15 +112,15 @@ Access frontend webpage: http://127.0.0.1:8000/api/webpage/
 ---
 
 ### Images
-**Swagger documentation**
-![image](https://github.com/user-attachments/assets/94a703d7-2d73-499c-a3f6-eb3585d80004)
 
-**Endpoint response**
-![image](https://github.com/user-attachments/assets/917368d9-ce26-4b5d-9caa-a7283afefbdd)
+**Swagger documentation**  
+![Swagger documentation](https://github.com/user-attachments/assets/94a703d7-2d73-499c-a3f6-eb3585d80004)
 
-**Response using filters**
-![image](https://github.com/user-attachments/assets/632c8548-2574-4c8b-8a8a-5cc70960d0ef)
+**Endpoint response**  
+![Endpoint response](https://github.com/user-attachments/assets/917368d9-ce26-4b5d-9caa-a7283afefbdd)
 
-**Testing on GUI**
-![image](https://github.com/user-attachments/assets/e38468c1-d260-4220-abb1-ca1a3114fcf1)
+**Response using filters**  
+![Response using filters](https://github.com/user-attachments/assets/632c8548-2574-4c8b-8a8a-5cc70960d0ef)
 
+**Testing on GUI**  
+![Testing on GUI](https://github.com/user-attachments/assets/e38468c1-d260-4220-abb1-ca1a3114fcf1)
