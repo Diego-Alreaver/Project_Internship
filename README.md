@@ -16,9 +16,6 @@
   - Uses JWT for access token management.
   - Admin-only access to sensitive endpoints.
 
-- **Optional Frontend**:
-  - A simple HTML and CSS interface for testing the `POST /breeds/details/` endpoint.
-
 - **Interactive Documentation**:
   - Swagger-powered API documentation for easy exploration and testing.
 
@@ -53,6 +50,30 @@
 
 ---
 
+## 🌐 Deployment
+
+The project is deployed on **Railway** and accessible at:  
+[https://projectinternship-production.up.railway.app](https://projectinternship-production.up.railway.app)
+
+### Important Notes for Testing:
+- Upon opening the website, you will be automatically redirected to the **Swagger** documentation for easy testing of the API endpoints.
+- To test the **search-history** endpoint, you will need an **admin token**. For convenience, a superuser admin has been created. Put these credentials on /token/:
+   - **Username**: `admin`
+   - **Password**: `admin`
+   
+   Using the these login credentials you can obtain the access token. The token can be found under the **access** field. 
+   - To use the token, click on **Authorize** in the Swagger UI and enter the token in the following format:  
+     `Bearer <your-token-here>` (Example: `Bearer LO68qqaW`).
+
+- The token is **necessary** to access the **search-history** endpoint as it is protected by JWT authentication.
+  
+### Optional Web Interface for POST Endpoint:
+- If you prefer testing the **POST** endpoint `breeds/details/` through a graphical interface, you can visit:  
+  [https://projectinternship-production.up.railway.app/api/webpage](https://projectinternship-production.up.railway.app/api/webpage)
+**Note**: Please be aware that the interface is quite simple, as frontend is not my strong suit.
+
+---
+
 ## 🚀 How to Run (locally)
 
 ### Prerequisites
@@ -80,31 +101,11 @@
 6. Access Swagger documentation:
    Visit http://127.0.0.1:8000/swagger/
 
-next steps are optional:
+Next steps are optional:
 Run unit tests: python manage.py test
 Access frontend webpage: http://127.0.0.1:8000/api/webpage/
 
 ---
 
-## 🌐 Deployment
 
-The project is deployed on **Railway** and accessible at:  
-[https://projectinternship-production.up.railway.app](https://projectinternship-production.up.railway.app)
-
-### Important Notes for Testing:
-- Upon opening the website, you will be automatically redirected to the **Swagger** documentation for easy testing of the API endpoints.
-- To test the **search-history** endpoint, you will need an **admin token**. For convenience, a superuser admin has been created. Put these credentials on /token/:
-   - **Username**: `admin`
-   - **Password**: `admin`
-   
-   Using the these login credentials you can obtain the access token. The token can be found under the **access** field. 
-   - To use the token, click on **Authorize** in the Swagger UI and enter the token in the following format:  
-     `Bearer <your-token-here>` (Example: `Bearer LO68qqaW`).
-
-- The token is **necessary** to access the **search-history** endpoint as it is protected by JWT authentication.
-  
-### Optional Web Interface for POST Endpoint:
-- If you prefer testing the **POST** endpoint `breeds/details/` through a graphical interface, you can visit:  
-  [https://projectinternship-production.up.railway.app/api/webpage](https://projectinternship-production.up.railway.app/api/webpage)
-**Note**: Please be aware that the interface is quite simple, as frontend is not my strong suit.
 
