@@ -3,7 +3,7 @@
 
 BarkGIF is a fun and interactive RESTful API where you can search through different dog breeds! Use filters to find a breed that matches the characteristics you're looking for, then dive deeper by querying the breed to get its traits and a fun GIF showing that breed in action! Whether you're a dog lover or just curious, BarkGIF brings you closer to discovering the perfect pup with a bit of playful flair! 🐕🎉
 
-Enough of advertising, now the serious part: 
+**Enough of advertising, now the serious part:** 
 **BarkGIF** is a RESTful API designed to showcase my backend development skills, implementing best practices while meeting project requirements. This project combines external API integrations, authentication, caching, and deployment, with a basic frontend integration for testing purposes.
 
 ---
